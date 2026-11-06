@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Psicología Educativa - Identificación de Dificultades de Aprendizaje</title>
-    <!-- Tailwind CSS CDN -->
+    <title>Dashboard Neuroeducativo: Dificultades Específicas del Aprendizaje</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -18,14 +18,17 @@
                         sans: ['Inter', 'sans-serif'],
                     },
                     colors: {
+                        navy: {
+                            800: '#0f172a',
+                            900: '#0b132b',
+                            950: '#050c1e',
+                        },
                         brand: {
-                            50: '#eef2ff',
-                            100: '#e0e7ff',
-                            500: '#6366f1',
-                            600: '#4f46e5',
-                            700: '#4338ca',
-                            800: '#3730a3',
-                            900: '#312e81',
+                            blue: '#2563eb',
+                            purple: '#7c3aed',
+                            emerald: '#059669',
+                            amber: '#d97706',
+                            rose: '#e11d48',
                         }
                     }
                 }
@@ -33,847 +36,796 @@
         }
     </script>
     <style>
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 6px;
+        /* Custom scrollbar and smooth transitions */
+        html {
+            scroll-behavior: smooth;
         }
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: #f1f5f9;
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
         }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 9999px;
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
         }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
         }
-        .tab-content {
-            display: none;
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
         }
-        .tab-content.active {
-            display: block;
-            animation: fadeIn 0.3s ease-in-out;
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.35s cubic-bezier(0, 1, 0, 1);
         }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(4px); }
-            to { opacity: 1; transform: translateY(0); }
+        .accordion-content.active {
+            max-height: 3000px;
+            transition: max-height 0.5s ease-in-out;
+        }
+        .glass-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
         }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col antialiased">
+<body class="bg-slate-950 text-slate-100 font-sans antialiased min-h-screen flex flex-col md:flex-row">
 
-    <!-- Top Header Bar -->
-    <header class="bg-indigo-900 text-white sticky top-0 z-30 shadow-lg border-b border-indigo-800">
-        <div class="px-4 py-3 flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-                <button onclick="toggleSidebar()" class="p-2 rounded-xl text-indigo-200 hover:text-white hover:bg-indigo-800 focus:outline-none transition">
-                    <i class="fa-solid fa-bars text-xl"></i>
-                </button>
-                <div class="flex items-center space-x-2">
-                    <div class="bg-indigo-600 p-2 rounded-xl text-white shadow-md">
-                        <i class="fa-solid fa-brain text-lg"></i>
-                    </div>
-                    <div>
-                        <h1 class="font-extrabold text-sm sm:text-base tracking-tight leading-none text-white">Psicología Educativa</h1>
-                        <p class="text-[11px] text-indigo-300 font-medium">Unidad: Identificación de Dificultades de Aprendizaje</p>
-                    </div>
+    <!-- Sidebar Navigation -->
+    <aside class="w-full md:w-72 bg-navy-900 border-r border-slate-800 p-6 flex flex-col justify-between shrink-0">
+        <div>
+            <!-- Header Logo -->
+            <div class="flex items-center gap-3 mb-8">
+                <div class="p-3 bg-blue-600/20 text-blue-400 rounded-xl border border-blue-500/30">
+                    <i class="fa-solid fa-brain text-2xl"></i>
                 </div>
-            </div>
-            
-            <div class="flex items-center space-x-2">
-                <button onclick="toggleReferencesModal()" class="hidden sm:inline-flex items-center space-x-2 bg-indigo-800/80 hover:bg-indigo-700 text-indigo-100 text-xs font-semibold px-3 py-2 rounded-xl border border-indigo-700 transition">
-                    <i class="fa-solid fa-book-bookmark text-indigo-300"></i>
-                    <span>Referencias APA</span>
-                </button>
-                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-indigo-800/80 text-indigo-200 border border-indigo-700">
-                    <i class="fa-solid fa-certificate text-emerald-400 mr-1.5 text-[10px]"></i> Módulo Académico
-                </span>
-            </div>
-        </div>
-    </header>
-
-    <div class="flex flex-1 overflow-hidden relative">
-
-        <!-- Sidebar Backdrop for Mobile -->
-        <div id="sidebarBackdrop" onclick="toggleSidebar()" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-20 hidden md:hidden transition-opacity"></div>
-
-        <!-- Left Navigation Sidebar -->
-        <aside id="sidebar" class="fixed md:static inset-y-0 left-0 w-72 bg-white border-r border-slate-200 z-20 flex flex-col transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out shadow-xl md:shadow-none">
-            <div class="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
-                <div class="flex items-center space-x-2">
-                    <i class="fa-solid fa-compass text-indigo-600"></i>
-                    <span class="font-bold text-xs uppercase tracking-wider text-slate-500">Módulos de Estudio</span>
+                <div>
+                    <h1 class="font-bold text-lg text-white leading-tight">NeuroDEA</h1>
+                    <p class="text-xs text-slate-400">Plataforma Neuroeducativa</p>
                 </div>
-                <button onclick="toggleSidebar()" class="md:hidden text-slate-400 hover:text-slate-600">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
             </div>
 
             <!-- Navigation Links -->
-            <nav class="p-3 space-y-1.5 overflow-y-auto custom-scrollbar flex-1 text-sm font-medium">
-                <button onclick="switchTab('inicio')" id="nav-inicio" class="nav-btn w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl transition text-indigo-700 bg-indigo-50 font-semibold shadow-xs">
-                    <i class="fa-solid fa-house w-5 text-center text-indigo-600"></i>
-                    <span>Inicio y Presentación</span>
-                </button>
-
-                <button onclick="switchTab('evaluacion')" id="nav-evaluacion" class="nav-btn w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl transition text-slate-600 hover:bg-slate-100 hover:text-slate-900">
-                    <i class="fa-solid fa-clipboard-check w-5 text-center text-slate-500"></i>
-                    <span>Evaluación Psicoeducativa</span>
-                </button>
-
-                <button onclick="switchTab('tea')" id="nav-tea" class="nav-btn w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl transition text-slate-600 hover:bg-slate-100 hover:text-slate-900">
-                    <i class="fa-solid fa-puzzle-piece w-5 text-center text-slate-500"></i>
-                    <span>Trastornos Específicos (TEA)</span>
-                </button>
-
-                <button onclick="switchTab('inclusión')" id="nav-inclusión" class="nav-btn w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl transition text-slate-600 hover:bg-slate-100 hover:text-slate-900">
-                    <i class="fa-solid fa-universal-access w-5 text-center text-slate-500"></i>
-                    <span>Inclusión: DUA y PIAR</span>
-                </button>
-
-                <button onclick="switchTab('normativa')" id="nav-normativa" class="nav-btn w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl transition text-slate-600 hover:bg-slate-100 hover:text-slate-900">
-                    <i class="fa-solid fa-scale-balanced w-5 text-center text-slate-500"></i>
-                    <span>Marco Normativo Colombia</span>
-                </button>
-
-                <button onclick="switchTab('articulos')" id="nav-articulos" class="nav-btn w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl transition text-slate-600 hover:bg-slate-100 hover:text-slate-900">
-                    <i class="fa-solid fa-newspaper w-5 text-center text-slate-500"></i>
-                    <span>Artículos Científicos</span>
-                </button>
-
-                <button onclick="switchTab('juegos')" id="nav-juegos" class="nav-btn w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl transition text-slate-600 hover:bg-slate-100 hover:text-slate-900">
-                    <i class="fa-solid fa-gamepad w-5 text-center text-slate-500"></i>
-                    <span>Juegos e Interactivos</span>
-                </button>
-
-                <button onclick="switchTab('referencias')" id="nav-referencias" class="nav-btn w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl transition text-slate-600 hover:bg-slate-100 hover:text-slate-900 border-t border-slate-100 pt-3 mt-2">
-                    <i class="fa-solid fa-book-bookmark w-5 text-center text-indigo-600"></i>
-                    <span class="font-semibold text-indigo-900">Referencias Bibliográficas</span>
-                </button>
+            <nav class="space-y-1">
+                <a href="#introduccion" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-slate-800 hover:text-white transition group">
+                    <i class="fa-solid fa-flask-vial text-blue-400 group-hover:scale-110 transition-transform"></i>
+                    <span class="text-sm font-medium">Bases Neurobiológicas</span>
+                </a>
+                <a href="#trastornos" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-slate-800 hover:text-white transition group">
+                    <i class="fa-solid fa-layer-group text-purple-400 group-hover:scale-110 transition-transform"></i>
+                    <span class="text-sm font-medium">Análisis por Trastorno</span>
+                </a>
+                <a href="#comorbilidad" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-slate-800 hover:text-white transition group">
+                    <i class="fa-solid fa-network-wired text-emerald-400 group-hover:scale-110 transition-transform"></i>
+                    <span class="text-sm font-medium">Matriz de Comorbilidad</span>
+                </a>
+                <a href="#casos" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-slate-800 hover:text-white transition group">
+                    <i class="fa-solid fa-user-graduate text-amber-400 group-hover:scale-110 transition-transform"></i>
+                    <span class="text-sm font-medium">Estudios de Caso</span>
+                </a>
+                <a href="#evaluacion" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-slate-800 hover:text-white transition group">
+                    <i class="fa-solid fa-gamepad text-rose-400 group-hover:scale-110 transition-transform"></i>
+                    <span class="text-sm font-medium">Juego Evaluativo</span>
+                </a>
             </nav>
-
-            <!-- Sidebar Footer Author info -->
-            <div class="p-3.5 bg-slate-50 border-t border-slate-200">
-                <div class="p-3 bg-white rounded-xl border border-slate-200 shadow-2xs">
-                    <p class="text-[10px] font-bold uppercase tracking-wider text-indigo-600">Docente Autor</p>
-                    <p class="text-xs font-semibold text-slate-800 mt-0.5">Psicólogo, Especialista en Estudios Pedagógicos y Magíster en Educación</p>
-                </div>
-            </div>
-        </aside>
-
-        <!-- Main Content View Area -->
-        <main class="flex-1 overflow-y-auto custom-scrollbar p-4 sm:p-6 lg:p-8 bg-slate-50">
-            
-            <!-- SECTION 1: INICIO & PRESENTACION -->
-            <section id="tab-inicio" class="tab-content active space-y-8 max-w-6xl mx-auto">
-                
-                <!-- Main Header Banner -->
-                <div class="bg-gradient-to-r from-indigo-900 via-indigo-800 to-slate-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden border border-indigo-700/50">
-                    <div class="absolute -right-10 -bottom-10 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
-                    <div class="relative z-10 max-w-4xl">
-                        <div class="inline-flex items-center space-x-2 bg-indigo-500/20 text-indigo-200 px-3 py-1 rounded-full text-xs font-semibold mb-4 border border-indigo-400/30">
-                            <i class="fa-solid fa-graduation-cap"></i>
-                            <span>Asignatura: Psicología Educativa</span>
-                        </div>
-                        <h2 class="text-2xl sm:text-4xl font-black tracking-tight leading-tight text-white">
-                            Unidad: Identificación de Dificultades de Aprendizaje
-                        </h2>
-                        
-                        <p class="mt-4 text-slate-200 text-sm sm:text-base leading-relaxed font-normal">
-                            La evaluación psicoeducativa constituye un proceso integral, continuo y multidimensional diseñado para identificar las barreras en el aprendizaje, las necesidades educativas específicas y el contexto biopsicosocial del estudiante. A través de este recurso interactivo, exploraremos desde las bases conceptuales y diagnósticas de los Trastornos Específicos del Aprendizaje (TEA) hasta la implementación práctica del Diseño Universal para el Aprendizaje (DUA) y el Plan Individual de Ajustes Razonables (PIAR), sustentados en el marco normativo colombiano (Decreto 1421, Ley 2383 y Código de Infancia y Adolescencia).
-                        </p>
-
-                        <!-- Author Credentials Tag & Interactive Button -->
-                        <div class="mt-6 pt-5 border-t border-indigo-700/60 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                            <div class="flex items-center space-x-3">
-                                <div class="w-10 h-10 rounded-xl bg-indigo-500/30 border border-indigo-400/40 flex items-center justify-center text-indigo-200 font-bold text-lg shadow-inner">
-                                    <i class="fa-solid fa-user-check"></i>
-                                </div>
-                                <div>
-                                    <p class="text-[10px] uppercase tracking-wider text-indigo-300 font-bold">Autor del Contenido:</p>
-                                    <p class="text-xs sm:text-sm font-bold text-white">Psicólogo, Especialista en Estudios Pedagógicos y Magíster en Educación</p>
-                                </div>
-                            </div>
-
-                            <button onclick="toggleReferencesModal()" class="inline-flex items-center justify-center space-x-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold px-4 py-2.5 rounded-xl border border-indigo-400/40 shadow-md transition transform active:scale-95 shrink-0">
-                                <i class="fa-solid fa-book-bookmark text-indigo-200"></i>
-                                <span>Ver Referencias Bibliográficas</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Learning Objectives -->
-                <div class="space-y-4">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold">
-                            <i class="fa-solid fa-bullseye"></i>
-                        </div>
-                        <h3 class="text-xl font-extrabold text-slate-800 tracking-tight">Objetivos de Aprendizaje</h3>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-                        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition">
-                            <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold mb-3">1</div>
-                            <h4 class="font-bold text-slate-800 text-base mb-2">Analizar Procesos Evaluativos</h4>
-                            <p class="text-slate-600 text-xs sm:text-sm leading-relaxed">
-                                Comprender las fases, fuentes e instrumentos de la evaluación psicoeducativa (fisiológicos, cognitivos, afectivos y contextuales) para una recolección diagnóstica integral.
-                            </p>
-                        </div>
-
-                        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition">
-                            <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold mb-3">2</div>
-                            <h4 class="font-bold text-slate-800 text-base mb-2">Identificar Manifestaciones de los TEA</h4>
-                            <p class="text-slate-600 text-xs sm:text-sm leading-relaxed">
-                                Reconocer los signos clínicos, criterios diagnósticos y características pedagógicas de la Dislexia, Disgrafía y Discalculia en el contexto del aula.
-                            </p>
-                        </div>
-
-                        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition">
-                            <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold mb-3">3</div>
-                            <h4 class="font-bold text-slate-800 text-base mb-2">Aplicar Marcos Inclusivos y Normativos</h4>
-                            <p class="text-slate-600 text-xs sm:text-sm leading-relaxed">
-                                Diseñar e implementar estrategias bajo los enfoques del DUA y PIAR, alineados con la normativa colombiana vigente (Decreto 1421, Ley 2383 y Código de Infancia y Adolescencia).
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Multimedia Section: 3 YouTube Videos -->
-                <div class="space-y-4 pt-4">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-8 h-8 rounded-lg bg-red-100 text-red-600 flex items-center justify-center font-bold">
-                            <i class="fa-brands fa-youtube"></i>
-                        </div>
-                        <div>
-                            <h3 class="text-xl font-extrabold text-slate-800 tracking-tight">Recursos Audiovisuales Seleccionados</h3>
-                            <p class="text-xs text-slate-500">Proyección de contenidos clave sobre trastornos específicos del aprendizaje y neurodiversidad</p>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <!-- Video Card 1 -->
-                        <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm flex flex-col">
-                            <div class="aspect-video w-full bg-slate-900 relative">
-                                <iframe class="w-full h-full" src="https://www.youtube-nocookie.com/embed/14eI3G1c45c" title="Trastornos Específicos del Aprendizaje" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-                            </div>
-                            <div class="p-4 flex-1 flex flex-col justify-between">
-                                <div>
-                                    <span class="text-[10px] font-bold text-indigo-600 uppercase tracking-wider">Conceptos Fundamentales</span>
-                                    <h4 class="font-bold text-slate-800 text-sm mt-1">¿Qué son los Trastornos Específicos del Aprendizaje?</h4>
-                                    <p class="text-xs text-slate-500 mt-2 leading-relaxed">Explicación comprensiva sobre las bases neurobiológicas de las dificultades de aprendizaje en la infancia.</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Video Card 2 -->
-                        <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm flex flex-col">
-                            <div class="aspect-video w-full bg-slate-900 relative">
-                                <iframe class="w-full h-full" src="https://www.youtube-nocookie.com/embed/p1u42N4d0K0" title="Dislexia y Dificultades de Lectura" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-                            </div>
-                            <div class="p-4 flex-1 flex flex-col justify-between">
-                                <div>
-                                    <span class="text-[10px] font-bold text-indigo-600 uppercase tracking-wider">Lectoesctritura</span>
-                                    <h4 class="font-bold text-slate-800 text-sm mt-1">Dislexia: Detección e Intervención Temprana</h4>
-                                    <p class="text-xs text-slate-500 mt-2 leading-relaxed">Estrategias de identificación en el aula y adaptaciones pedagógicas oportunas para la ruta fonológica.</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Video Card 3 -->
-                        <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm flex flex-col">
-                            <div class="aspect-video w-full bg-slate-900 relative">
-                                <iframe class="w-full h-full" src="https://www.youtube-nocookie.com/embed/3t-50p-Jzbc" title="Estrategias de Inclusión DUA" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-                            </div>
-                            <div class="p-4 flex-1 flex flex-col justify-between">
-                                <div>
-                                    <span class="text-[10px] font-bold text-indigo-600 uppercase tracking-wider">Práctica Inclusiva</span>
-                                    <h4 class="font-bold text-slate-800 text-sm mt-1">Aplicación del DUA en el Aula Inclusiva</h4>
-                                    <p class="text-xs text-slate-500 mt-2 leading-relaxed">Pautas prácticas para ofrecer múltiples formas de representación, expresión y motivación a los estudiantes.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </section>
-
-            <!-- SECTION 2: EVALUACION PSICOEDUCATIVA -->
-            <section id="tab-evaluacion" class="tab-content space-y-6 max-w-5xl mx-auto">
-                <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
-                    <div class="flex items-center space-x-3 mb-4">
-                        <div class="p-2 bg-indigo-100 text-indigo-700 rounded-xl">
-                            <i class="fa-solid fa-clipboard-check text-xl"></i>
-                        </div>
-                        <div>
-                            <h2 class="text-2xl font-bold text-slate-800">Evaluación Psicoeducativa en el Contexto Escolar</h2>
-                            <p class="text-xs text-slate-500">Proceso diagnóstico sistemático (Vane & Motta, 2013; Peñafiel-Martínez et al., 2014)</p>
-                        </div>
-                    </div>
-
-                    <p class="text-sm text-slate-600 leading-relaxed">
-                        La evaluación debe ofrecer una **"fotografía viva"** del estudiante derivada del análisis de su historia evolutiva y su comportamiento presente. Implica explorar exhaustivamente tanto las características internas del sujeto como las dinámicas de su entorno.
-                    </p>
-
-                    <!-- Information Blocks -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                        <!-- Block 1: Student Information -->
-                        <div class="p-5 bg-indigo-50/50 rounded-2xl border border-indigo-100 space-y-3">
-                            <div class="flex items-center space-x-2 text-indigo-800 font-bold text-base">
-                                <i class="fa-solid fa-user-gear"></i>
-                                <h3>1. Información sobre el Alumno</h3>
-                            </div>
-                            <ul class="space-y-2 text-xs text-slate-700">
-                                <li class="flex items-start"><i class="fa-solid fa-angle-right text-indigo-500 mt-0.5 mr-2"></i><span><strong>Desarrollo Biol-Cognitivo:</strong> Aspectos motores, lingüísticos, emocionales y nivel intelectual.</span></li>
-                                <li class="flex items-start"><i class="fa-solid fa-angle-right text-indigo-500 mt-0.5 mr-2"></i><span><strong>Competencia Curricular:</strong> Nivel real de dominio frente a las exigencias académicas de su grado.</span></li>
-                                <li class="flex items-start"><i class="fa-solid fa-angle-right text-indigo-500 mt-0.5 mr-2"></i><span><strong>Estilo de Aprendizaje:</strong> Vías preferentes de procesamiento (visual, auditivo, kinestésico) y motivación.</span></li>
-                            </ul>
-                        </div>
-
-                        <!-- Block 2: Environment Information -->
-                        <div class="p-5 bg-emerald-50/50 rounded-2xl border border-emerald-100 space-y-3">
-                            <div class="flex items-center space-x-2 text-emerald-800 font-bold text-base">
-                                <i class="fa-solid fa-people-roof"></i>
-                                <h3>2. Información sobre el Entorno</h3>
-                            </div>
-                            <ul class="space-y-2 text-xs text-slate-700">
-                                <li class="flex items-start"><i class="fa-solid fa-angle-right text-emerald-500 mt-0.5 mr-2"></i><span><strong>Contexto Escolar:</strong> Clima de aula, adecuación de programaciones pedagógicas y relación docente-estudiante.</span></li>
-                                <li class="flex items-start"><i class="fa-solid fa-angle-right text-emerald-500 mt-0.5 mr-2"></i><span><strong>Contexto Sociofamiliar:</strong> Dinámica familiar, antecedentes, pautas de crianza y factores estresantes (duelos, divorcios).</span></li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <!-- Psychometric & Pedagogical Instruments Table -->
-                    <div class="mt-8 space-y-4">
-                        <h3 class="font-bold text-slate-800 text-lg flex items-center">
-                            <i class="fa-solid fa-vial-circle-check text-indigo-600 mr-2"></i>
-                            Batería de Pruebas e Instrumentos de Evaluación
-                        </h3>
-
-                        <div class="overflow-x-auto rounded-2xl border border-slate-200">
-                            <table class="w-full text-left border-collapse text-xs">
-                                <thead>
-                                    <tr class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
-                                        <th class="p-3">Área Evaluada</th>
-                                        <th class="p-3">Instrumentos / Pruebas Principales</th>
-                                        <th class="p-3">Propósito Diagnóstico</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-slate-200 text-slate-700">
-                                    <tr>
-                                        <td class="p-3 font-semibold text-slate-900">Capacidad Intelectual General</td>
-                                        <td class="p-3">WISC-V, Terman-Merrill, Matrices Progresivas de Raven</td>
-                                        <td class="p-3">Descartar discapacidad intelectual y analizar discrepancia entre CI Verbal y Manipulativo.</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="p-3 font-semibold text-slate-900">Procesos Lectores y Escritores</td>
-                                        <td class="p-3">PROLEC-R, Batería ENI, Escala de Competencia Escritora (ECE)</td>
-                                        <td class="p-3">Evaluar decodificación, fluidez, comprensión semántica y ruta fonológica/visoperceptiva.</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="p-3 font-semibold text-slate-900">Nivel Perceptivo-Motriz y Lateralidad</td>
-                                        <td class="p-3">Test Guestáltico Viso-Motor de Bender, Batería de Harris, Test ABC de L. Filho</td>
-                                        <td class="p-3">Explorar madurez visomotora, coordinación, dominancia lateral y resistencia a inversiones.</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="p-3 font-semibold text-slate-900">Habilidades Matemáticas</td>
-                                        <td class="p-3">TEDI-MATH, Subpruebas WISC-V de Razonamiento Cuantitativo</td>
-                                        <td class="p-3">Evaluar el sentido numérico, procesamiento arábigo, cálculo automático y resolución de problemas.</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="p-3 font-semibold text-slate-900">Ajuste Emocional y Personalidad</td>
-                                        <td class="p-3">BASC-3, Test de la Figura Humana (Goodenough-Harris), Test de la Familia</td>
-                                        <td class="p-3">Identificar rasgos de ansiedad, depresión, frustración o baja autoestima asociados al rendimiento.</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- SECTION 3: TRASTORNOS ESPECIFICOS DEL APRENDIZAJE (TEA) -->
-            <section id="tab-tea" class="tab-content space-y-6 max-w-5xl mx-auto">
-                <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
-                    <div class="flex items-center space-x-3 mb-4">
-                        <div class="p-2 bg-indigo-100 text-indigo-700 rounded-xl">
-                            <i class="fa-solid fa-puzzle-piece text-xl"></i>
-                        </div>
-                        <div>
-                            <h2 class="text-2xl font-bold text-slate-800">Trastornos Específicos del Aprendizaje (TEA)</h2>
-                            <p class="text-xs text-slate-500">Alteraciones neurobiológicas del procesamiento del aprendizaje escolar</p>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
-                        <!-- Dislexia -->
-                        <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs hover:border-indigo-300 transition flex flex-col justify-between">
-                            <div>
-                                <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center font-bold mb-3 text-lg">
-                                    <i class="fa-solid fa-book-open"></i>
-                                </div>
-                                <h3 class="font-bold text-slate-800 text-lg">Dislexia</h3>
-                                <p class="text-xs text-slate-500 mt-1 font-medium">Dificultad en la Lectura</p>
-                                <hr class="my-3 border-slate-100">
-                                <ul class="space-y-2 text-xs text-slate-600">
-                                    <li class="flex items-start"><i class="fa-solid fa-xmark text-red-500 mr-1.5 mt-0.5"></i> Omisiones, adiciones o sustitución de fonemas/grafemas.</li>
-                                    <li class="flex items-start"><i class="fa-solid fa-xmark text-red-500 mr-1.5 mt-0.5"></i> Lectura silábica lenta con falta de fluidez.</li>
-                                    <li class="flex items-start"><i class="fa-solid fa-xmark text-red-500 mr-1.5 mt-0.5"></i> Deficiente comprensión del texto leído.</li>
-                                </ul>
-                            </div>
-                            <div class="mt-4 p-2.5 bg-blue-50/60 rounded-xl text-[11px] text-blue-900 font-medium">
-                                <strong>Apoyo:</strong> Uso de textos macrotipo, lectura guiada y apoyo fonológico explícito.
-                            </div>
-                        </div>
-
-                        <!-- Disgrafía -->
-                        <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs hover:border-indigo-300 transition flex flex-col justify-between">
-                            <div>
-                                <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center font-bold mb-3 text-lg">
-                                    <i class="fa-solid fa-pen-nib"></i>
-                                </div>
-                                <h3 class="font-bold text-slate-800 text-lg">Disgrafía</h3>
-                                <p class="text-xs text-slate-500 mt-1 font-medium">Dificultad en la Escritura y Grafismo</p>
-                                <hr class="my-3 border-slate-100">
-                                <ul class="space-y-2 text-xs text-slate-600">
-                                    <li class="flex items-start"><i class="fa-solid fa-xmark text-red-500 mr-1.5 mt-0.5"></i> Trazos ilegibles, postura inadecuada y prensión anómala del lápiz.</li>
-                                    <li class="flex items-start"><i class="fa-solid fa-xmark text-red-500 mr-1.5 mt-0.5"></i> Errores ortográficos persistentes y falta de cohesión.</li>
-                                    <li class="flex items-start"><i class="fa-solid fa-xmark text-red-500 mr-1.5 mt-0.5"></i> Dificultad en el ajuste espacial dentro del cuaderno.</li>
-                                </ul>
-                            </div>
-                            <div class="mt-4 p-2.5 bg-amber-50/60 rounded-xl text-[11px] text-amber-900 font-medium">
-                                <strong>Apoyo:</strong> Adaptadores de agarre (grips), pautas de guía y evaluaciones orales.
-                            </div>
-                        </div>
-
-                        <!-- Discalculia -->
-                        <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs hover:border-indigo-300 transition flex flex-col justify-between">
-                            <div>
-                                <div class="w-10 h-10 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center font-bold mb-3 text-lg">
-                                    <i class="fa-solid fa-calculator"></i>
-                                </div>
-                                <h3 class="font-bold text-slate-800 text-lg">Discalculia</h3>
-                                <p class="text-xs text-slate-500 mt-1 font-medium">Dificultad en las Matemáticas</p>
-                                <hr class="my-3 border-slate-100">
-                                <ul class="space-y-2 text-xs text-slate-600">
-                                    <li class="flex items-start"><i class="fa-solid fa-xmark text-red-500 mr-1.5 mt-0.5"></i> Alteración del sentido intuitivo de magnitud y número.</li>
-                                    <li class="flex items-start"><i class="fa-solid fa-xmark text-red-500 mr-1.5 mt-0.5"></i> Incapacidad para automatizar tablas o algoritmos de cálculo.</li>
-                                    <li class="flex items-start"><i class="fa-solid fa-xmark text-red-500 mr-1.5 mt-0.5"></i> Dificultad para alinear números o insertar símbolos.</li>
-                                </ul>
-                            </div>
-                            <div class="mt-4 p-2.5 bg-purple-50/60 rounded-xl text-[11px] text-purple-900 font-medium">
-                                <strong>Apoyo:</strong> Material concreto (ábonos, bloques de Base 10) y uso de tablas visuales.
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- SECTION 4: INCLUSION (DUA & PIAR) -->
-            <section id="tab-inclusión" class="tab-content space-y-6 max-w-5xl mx-auto">
-                <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
-                    <div class="flex items-center space-x-3 mb-4">
-                        <div class="p-2 bg-indigo-100 text-indigo-700 rounded-xl">
-                            <i class="fa-solid fa-universal-access text-xl"></i>
-                        </div>
-                        <div>
-                            <h2 class="text-2xl font-bold text-slate-800">Estrategias de Inclusión: DUA y PIAR</h2>
-                            <p class="text-xs text-slate-500">Herramientas pedagógicas para la eliminación de barreras en el aprendizaje</p>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                        <!-- DUA Section -->
-                        <div class="p-5 bg-gradient-to-br from-indigo-50 to-white rounded-2xl border border-indigo-100 space-y-3">
-                            <div class="flex items-center space-x-2 text-indigo-900 font-bold text-lg">
-                                <i class="fa-solid fa-layer-group text-indigo-600"></i>
-                                <h3>DUA (Diseño Universal para el Aprendizaje)</h3>
-                            </div>
-                            <p class="text-xs text-slate-600 leading-relaxed">
-                                Marco educativo sistemático diseñado para minimizar barreras y maximizar el aprendizaje de todos los estudiantes desde la planeación curricular inicial.
-                            </p>
-                            <div class="space-y-2 pt-2">
-                                <div class="p-2.5 bg-white rounded-xl border border-slate-200 text-xs">
-                                    <span class="font-bold text-indigo-700">1. Representación:</span> Ofrecer la información en MÚLTIPLES formatos (visual, auditivo, gráfico).
-                                </div>
-                                <div class="p-2.5 bg-white rounded-xl border border-slate-200 text-xs">
-                                    <span class="font-bold text-indigo-700">2. Acción y Expresión:</span> Permitir opciones variadas para demostrar lo aprendido (orales, proyectos, maquetas).
-                                </div>
-                                <div class="p-2.5 bg-white rounded-xl border border-slate-200 text-xs">
-                                    <span class="font-bold text-indigo-700">3. Compromiso:</span> Fomentar el interés y la motivación adaptada a los estilos individuales.
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- PIAR Section -->
-                        <div class="p-5 bg-gradient-to-br from-emerald-50 to-white rounded-2xl border border-emerald-100 space-y-3">
-                            <div class="flex items-center space-x-2 text-emerald-900 font-bold text-lg">
-                                <i class="fa-solid fa-id-card text-emerald-600"></i>
-                                <h3>PIAR (Plan Individual de Ajustes Razonables)</h3>
-                            </div>
-                            <p class="text-xs text-slate-600 leading-relaxed">
-                                Instrumento de planeación individualizado que garantiza las adaptaciones requeridas cuando el DUA no es suficiente para la participación efectiva.
-                            </p>
-                            <div class="space-y-2 pt-2">
-                                <div class="p-2.5 bg-white rounded-xl border border-slate-200 text-xs">
-                                    <span class="font-bold text-emerald-700">Valoración Pedagógica:</span> Descripción del perfil del estudiante, fortalezas y barreras identificadas.
-                                </div>
-                                <div class="p-2.5 bg-white rounded-xl border border-slate-200 text-xs">
-                                    <span class="font-bold text-emerald-700">Ajustes Curriculares:</span> Modificaciones en tiempos, materiales, metodología y procesos evaluativos.
-                                </div>
-                                <div class="p-2.5 bg-white rounded-xl border border-slate-200 text-xs">
-                                    <span class="font-bold text-emerald-700">Acta de Acuerdo:</span> Compromisos asumidos por el aula, la familia y los directivos docentes.
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- SECTION 5: MARCO NORMATIVO COLOMBIA -->
-            <section id="tab-normativa" class="tab-content space-y-6 max-w-5xl mx-auto">
-                <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
-                    <div class="flex items-center space-x-3 mb-4">
-                        <div class="p-2 bg-indigo-100 text-indigo-700 rounded-xl">
-                            <i class="fa-solid fa-scale-balanced text-xl"></i>
-                        </div>
-                        <div>
-                            <h2 class="text-2xl font-bold text-slate-800">Marco Normativo Legal en Colombia</h2>
-                            <p class="text-xs text-slate-500">Fundamentación jurídica para la atención inclusiva y el desarrollo socioemocional</p>
-                        </div>
-                    </div>
-
-                    <div class="space-y-4 mt-6">
-                        <!-- Decreto 1421 -->
-                        <div class="p-5 bg-slate-50 rounded-2xl border border-slate-200 hover:border-indigo-300 transition">
-                            <div class="flex items-center justify-between">
-                                <span class="bg-indigo-600 text-white font-bold text-xs px-2.5 py-1 rounded-md">Decreto 1421 de 2017</span>
-                                <span class="text-xs text-slate-400 font-semibold">Ministerio de Educación Nacional</span>
-                            </div>
-                            <h3 class="font-bold text-slate-800 text-base mt-2">Reglamentación de la Educación Inclusiva</h3>
-                            <p class="text-xs text-slate-600 mt-1 leading-relaxed">
-                                Establece la ruta de acceso, permanencia y calidad para estudiantes con discapacidad o dificultades en el aprendizaje en todos los niveles educativos. Mandata la aplicación obligatoria del DUA y el PIAR.
-                            </p>
-                        </div>
-
-                        <!-- Ley 2383 -->
-                        <div class="p-5 bg-slate-50 rounded-2xl border border-slate-200 hover:border-indigo-300 transition">
-                            <div class="flex items-center justify-between">
-                                <span class="bg-emerald-600 text-white font-bold text-xs px-2.5 py-1 rounded-md">Ley 2383 de 2024</span>
-                                <span class="text-xs text-slate-400 font-semibold">Congreso de la República</span>
-                            </div>
-                            <h3 class="font-bold text-slate-800 text-base mt-2">Educación Socioemocional en las Instituciones</h3>
-                            <p class="text-xs text-slate-600 mt-1 leading-relaxed">
-                                Promueve de manera obligatoria la integración del desarrollo socioemocional en el currículo escolar, protegiendo la salud mental y fortaleciendo la resiliencia en estudiantes con dificultades de aprendizaje.
-                            </p>
-                        </div>
-
-                        <!-- Ley 1098 -->
-                        <div class="p-5 bg-slate-50 rounded-2xl border border-slate-200 hover:border-indigo-300 transition">
-                            <div class="flex items-center justify-between">
-                                <span class="bg-amber-600 text-white font-bold text-xs px-2.5 py-1 rounded-md">Ley 1098 de 2006</span>
-                                <span class="text-xs text-slate-400 font-semibold">Código de la Infancia y la Adolescencia</span>
-                            </div>
-                            <h3 class="font-bold text-slate-800 text-base mt-2">Garantía Superior de Derechos (Artículos Clave)</h3>
-                            <p class="text-xs text-slate-600 mt-1 leading-relaxed">
-                                Consagra la protección integral de niños, niñas y adolescentes. Garantiza el derecho a una educación de calidad diferenciada sin ningún tipo de discriminación.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- SECTION 6: ARTICULOS CIENTIFICOS -->
-            <section id="tab-articulos" class="tab-content space-y-6 max-w-5xl mx-auto">
-                <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
-                    <div class="flex items-center space-x-3 mb-4">
-                        <div class="p-2 bg-indigo-100 text-indigo-700 rounded-xl">
-                            <i class="fa-solid fa-newspaper text-xl"></i>
-                        </div>
-                        <div>
-                            <h2 class="text-2xl font-bold text-slate-800">Literatura y Artículos Científicos</h2>
-                            <p class="text-xs text-slate-500">Evidencia empírica sobre evaluación y neurodiversidad en el ámbito educativo</p>
-                        </div>
-                    </div>
-
-                    <div class="space-y-5 mt-6">
-                        <!-- Art. 1 -->
-                        <div class="p-5 bg-white rounded-2xl border border-slate-200 shadow-xs hover:shadow-md transition">
-                            <span class="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-full uppercase">Artículo 1 • Neuropsicología</span>
-                            <h3 class="font-bold text-slate-800 text-base mt-2">
-                                "Perfiles cognitivos del WISC-V en niños con trastornos específicos del aprendizaje"
-                            </h3>
-                            <p class="text-xs text-slate-500 font-medium">Revista de Neurología y Psicología Pedagógica (2022)</p>
-                            <p class="text-xs text-slate-600 mt-2 leading-relaxed">
-                                <strong>Aporte:</strong> El estudio demuestra una disociación significativa entre el Índice de Razonamiento Fluido y la Memoria de Trabajo/Velocidad de Procesamiento en niños evaluados con Dislexia y Discalculia.
-                            </p>
-                        </div>
-
-                        <!-- Art. 2 -->
-                        <div class="p-5 bg-white rounded-2xl border border-slate-200 shadow-xs hover:shadow-md transition">
-                            <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full uppercase">Artículo 2 • Inclusión y Normativa</span>
-                            <h3 class="font-bold text-slate-800 text-base mt-2">
-                                "Impacto del PIAR en el rendimiento académico y ajuste socioemocional en aulas colombianas"
-                            </h3>
-                            <p class="text-xs text-slate-500 font-medium">Revista Colombiana de Educación Inclusiva (2023)</p>
-                            <p class="text-xs text-slate-600 mt-2 leading-relaxed">
-                                <strong>Aporte:</strong> Evidencia que la implementación temprana del Decreto 1421 reduce en un 42% los síntomas de ansiedad escolar en estudiantes con dificultades de aprendizaje.
-                            </p>
-                        </div>
-
-                        <!-- Art. 3 -->
-                        <div class="p-5 bg-white rounded-2xl border border-slate-200 shadow-xs hover:shadow-md transition">
-                            <span class="text-[10px] font-bold text-purple-600 bg-purple-50 px-2.5 py-1 rounded-full uppercase">Artículo 3 • Didáctica Inclusiva</span>
-                            <h3 class="font-bold text-slate-800 text-base mt-2">
-                                "Efectividad del DUA en el desarrollo de la competencia lectora y matemática"
-                            </h3>
-                            <p class="text-xs text-slate-500 font-medium">International Journal of Educational Psychology (2021)</p>
-                            <p class="text-xs text-slate-600 mt-2 leading-relaxed">
-                                <strong>Aporte:</strong> Muestra que el aprendizaje con múltiples canales sensoriales beneficia no solo a los estudiantes con TEA sino al grupo aula en general.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- SECTION 7: JUEGOS INTERACTIVOS -->
-            <section id="tab-juegos" class="tab-content space-y-6 max-w-5xl mx-auto">
-                <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
-                    <div class="flex items-center space-x-3 mb-4">
-                        <div class="p-2 bg-indigo-100 text-indigo-700 rounded-xl">
-                            <i class="fa-solid fa-gamepad text-xl"></i>
-                        </div>
-                        <div>
-                            <h2 class="text-2xl font-bold text-slate-800">Módulo Interactivo y Evaluación de Conocimientos</h2>
-                            <p class="text-xs text-slate-500">Pon a prueba tu aprendizaje mediante actividades lúdico-prácticas</p>
-                        </div>
-                    </div>
-
-                    <!-- Quiz Block -->
-                    <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-4">
-                        <div class="flex justify-between items-center">
-                            <h3 class="font-bold text-slate-800 text-base">Quiz Formativo: Evaluación y DUA</h3>
-                            <span id="quizScore" class="text-xs font-bold bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full">Puntos: 0</span>
-                        </div>
-
-                        <div id="quizContainer" class="space-y-4">
-                            <!-- Question 1 -->
-                            <div class="p-4 bg-white rounded-xl border border-slate-200 space-y-2">
-                                <p class="text-xs font-bold text-slate-800">1. Según Vane y Motta (2013), ¿cuál es el objetivo de la evaluación psicoeducativa?</p>
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                                    <button onclick="checkAnswer(this, false)" class="p-2 rounded-lg border border-slate-200 hover:bg-slate-100 text-left">A. Asignar únicamente un número de CI.</button>
-                                    <button onclick="checkAnswer(this, true)" class="p-2 rounded-lg border border-slate-200 hover:bg-slate-100 text-left">B. Construir una "fotografía" integral del estudiante y su entorno.</button>
-                                </div>
-                            </div>
-
-                            <!-- Question 2 -->
-                            <div class="p-4 bg-white rounded-xl border border-slate-200 space-y-2">
-                                <p class="text-xs font-bold text-slate-800">2. ¿Qué decreto reglamenta la Educación Inclusiva en Colombia?</p>
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                                    <button onclick="checkAnswer(this, true)" class="p-2 rounded-lg border border-slate-200 hover:bg-slate-100 text-left">A. Decreto 1421 de 2017.</button>
-                                    <button onclick="checkAnswer(this, false)" class="p-2 rounded-lg border border-slate-200 hover:bg-slate-100 text-left">B. Ley 2383 de 2024.</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- SECTION 8: REFERENCIAS BIBLIOGRAFICAS COMPLETAS -->
-            <section id="tab-referencias" class="tab-content space-y-6 max-w-5xl mx-auto">
-                <div class="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-sm">
-                    <div class="flex items-center justify-between pb-4 border-b border-slate-100">
-                        <div class="flex items-center space-x-3">
-                            <div class="p-2.5 bg-indigo-100 text-indigo-700 rounded-xl">
-                                <i class="fa-solid fa-book-bookmark text-2xl"></i>
-                            </div>
-                            <div>
-                                <h2 class="text-2xl font-black text-slate-800">Referencias Bibliográficas</h2>
-                                <p class="text-xs text-slate-500">Citaciones estandarizadas en formato APA 7.ª edición</p>
-                            </div>
-                        </div>
-                        <span class="text-xs font-semibold text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-full border border-indigo-100">
-                            Fuentes Oficiales & Literatura
-                        </span>
-                    </div>
-
-                    <div class="mt-6 space-y-4">
-                        <p class="text-xs text-slate-500 italic mb-3">
-                            A continuación se consolidan los textos normativos, manuales diagnósticos y obras académicas consultadas para la estructuración de esta unidad:
-                        </p>
-
-                        <!-- Citation 1 -->
-                        <div class="p-4 bg-slate-50/80 rounded-2xl border border-slate-200 space-y-1">
-                            <p class="text-xs font-bold text-indigo-900">Congreso de la República de Colombia. (2006, 8 de noviembre).</p>
-                            <p class="text-xs text-slate-700 leading-relaxed">
-                                Ley 1098 de 2006. <em>Por la cual se expide el Código de la Infancia y la Adolescencia</em>. Diario Oficial No. 46.446.
-                            </p>
-                        </div>
-
-                        <!-- Citation 2 -->
-                        <div class="p-4 bg-slate-50/80 rounded-2xl border border-slate-200 space-y-1">
-                            <p class="text-xs font-bold text-indigo-900">Congreso de la República de Colombia. (2024, 23 de julio).</p>
-                            <p class="text-xs text-slate-700 leading-relaxed">
-                                Ley 2383 de 2024. <em>Por la cual se promueve la educación socioemocional en las instituciones educativas del país</em>.
-                            </p>
-                        </div>
-
-                        <!-- Citation 3 -->
-                        <div class="p-4 bg-slate-50/80 rounded-2xl border border-slate-200 space-y-1">
-                            <p class="text-xs font-bold text-indigo-900">Cuetos, F., Rodríguez, B., Ruano, E., & Arribas, D. (2014).</p>
-                            <p class="text-xs text-slate-700 leading-relaxed">
-                                <em>PROLEC-R: Batería de evaluación de los procesos lectores en niños de Educación Primaria</em> (4.ª ed.). TEA Ediciones.
-                            </p>
-                        </div>
-
-                        <!-- Citation 4 -->
-                        <div class="p-4 bg-slate-50/80 rounded-2xl border border-slate-200 space-y-1">
-                            <p class="text-xs font-bold text-indigo-900">Ministerio de Educación Nacional de Colombia. (2017, 29 de agosto).</p>
-                            <p class="text-xs text-slate-700 leading-relaxed">
-                                Decreto 1421 de 2017. <em>Por el cual se reglamenta en el marco de la educación inclusiva la atención educativa a la población con discapacidad</em>.
-                            </p>
-                        </div>
-
-                        <!-- Citation 5 -->
-                        <div class="p-4 bg-slate-50/80 rounded-2xl border border-slate-200 space-y-1">
-                            <p class="text-xs font-bold text-indigo-900">Peñafiel-Martínez, F., & Fernández-Alcántara, M. (2014).</p>
-                            <p class="text-xs text-slate-700 leading-relaxed">
-                                <em>Evaluación e intervención psicopedagógica en las dificultades del aprendizaje escolar</em>. Ediciones Pirámide.
-                            </p>
-                        </div>
-
-                        <!-- Citation 6 -->
-                        <div class="p-4 bg-slate-50/80 rounded-2xl border border-slate-200 space-y-1">
-                            <p class="text-xs font-bold text-indigo-900">Vane, J. R., & Motta, R. W. (2013).</p>
-                            <p class="text-xs text-slate-700 leading-relaxed">
-                                <em>Methods of Psychoeducational Assessment: Clinical Guidelines and Diagnostic Process</em>. Routledge.
-                            </p>
-                        </div>
-
-                        <!-- Citation 7 -->
-                        <div class="p-4 bg-slate-50/80 rounded-2xl border border-slate-200 space-y-1">
-                            <p class="text-xs font-bold text-indigo-900">Wechsler, D. (2014).</p>
-                            <p class="text-xs text-slate-700 leading-relaxed">
-                                <em>WISC-V: Escala de Inteligencia de Wechsler para Niños-V. Manual técnico y de interpretación</em>. NCS Pearson.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-        </main>
-    </div>
-
-    <!-- References Modal (Triggered by Button in Hero Header) -->
-    <div id="referencesModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-white rounded-3xl shadow-2xl max-w-2xl w-full max-h-[85vh] flex flex-col border border-slate-200 overflow-hidden transform transition-all">
-            
-            <div class="p-5 bg-indigo-900 text-white flex justify-between items-center border-b border-indigo-800">
-                <div class="flex items-center space-x-2">
-                    <i class="fa-solid fa-book-bookmark text-indigo-300 text-lg"></i>
-                    <h3 class="font-bold text-lg">Referencias Bibliográficas (APA 7)</h3>
-                </div>
-                <button onclick="toggleReferencesModal()" class="text-slate-300 hover:text-white p-1 rounded-lg hover:bg-indigo-800 transition">
-                    <i class="fa-solid fa-xmark text-xl"></i>
-                </button>
-            </div>
-
-            <div class="p-6 overflow-y-auto custom-scrollbar space-y-3 text-xs sm:text-sm text-slate-700 leading-relaxed">
-                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
-                    <p class="font-bold text-indigo-900">Congreso de la República de Colombia. (2006).</p>
-                    <p class="text-slate-600"><em>Ley 1098 de 2006: Código de la Infancia y la Adolescencia</em>. Diario Oficial No. 46.446.</p>
-                </div>
-
-                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
-                    <p class="font-bold text-indigo-900">Congreso de la República de Colombia. (2024).</p>
-                    <p class="text-slate-600"><em>Ley 2383 de 2024: Educación socioemocional en las instituciones educativas</em>.</p>
-                </div>
-
-                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
-                    <p class="font-bold text-indigo-900">Ministerio de Educación Nacional. (2017).</p>
-                    <p class="text-slate-600"><em>Decreto 1421 de 2017: Reglamentación de la Educación Inclusiva y PIAR</em>.</p>
-                </div>
-
-                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
-                    <p class="font-bold text-indigo-900">Peñafiel-Martínez, F., & Fernández-Alcántara, M. (2014).</p>
-                    <p class="text-slate-600"><em>Evaluación psicopedagógica e intervención en las dificultades del aprendizaje</em>. Pirámide.</p>
-                </div>
-
-                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
-                    <p class="font-bold text-indigo-900">Vane, J. R., & Motta, R. W. (2013).</p>
-                    <p class="text-slate-600"><em>Methods of Psychoeducational Assessment: Clinical Guidelines and Diagnostic Process</em>. Routledge.</p>
-                </div>
-            </div>
-
-            <div class="p-4 bg-slate-50 border-t border-slate-200 flex justify-end">
-                <button onclick="toggleReferencesModal()" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold rounded-xl transition">
-                    Cerrar Ventana
-                </button>
-            </div>
         </div>
-    </div>
 
-    <!-- JavaScript Vanilla Logic -->
+        <!-- Footer / Credits Sidebar -->
+        <div class="mt-8 pt-6 border-t border-slate-800/80">
+            <div class="flex items-center gap-2 text-xs text-slate-400">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span>Evidencia DSM-5 / CIE-11</span>
+            </div>
+            <p class="text-[11px] text-slate-500 mt-2">© 2026 Plataforma Clīnico-Educativa</p>
+        </div>
+    </aside>
+
+    <!-- Main Content Body -->
+    <main class="flex-1 overflow-y-auto p-4 md:p-8 space-y-10">
+
+        <!-- Header / Banner -->
+        <header class="glass-card rounded-2xl p-6 md:p-8 border border-slate-800 relative overflow-hidden">
+            <div class="absolute -right-10 -bottom-10 w-64 h-64 bg-blue-600/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="relative z-10 max-w-3xl">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 text-blue-400 text-xs font-semibold mb-4 border border-blue-500/20">
+                    <i class="fa-solid fa-microscope"></i> Neuropsicología y Adaptación Curricular
+                </div>
+                <h1 class="text-3xl md:text-4xl font-extrabold text-white tracking-tight leading-tight mb-4">
+                    Dificultades Específicas del Aprendizaje (DEA)
+                </h1>
+                <p class="text-slate-300 text-base md:text-lg leading-relaxed">
+                    Exploración integral de la Dislexia, Discalculia y Disgrafía: desde sus fundamentos genéticos y neurobiológicos según el DSM-5 y CIE-11, hasta estrategias prácticas de intervención multisensorial y adaptación curricular.
+                </p>
+            </div>
+        </header>
+
+        <!-- SECTION 1: INTRO & NEUROBIOLOGY -->
+        <section id="introduccion" class="space-y-6">
+            <div class="flex items-center gap-3">
+                <div class="w-2 h-7 bg-blue-500 rounded-full"></div>
+                <h2 class="text-2xl font-bold text-white">1. Origen y Marco Diagnóstico (DSM-5 / CIE-11)</h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Card 1: Etiología -->
+                <div class="glass-card p-6 rounded-2xl border border-slate-800 hover:border-slate-700 transition">
+                    <div class="w-12 h-12 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center text-xl mb-4">
+                        <i class="fa-solid fa-dna"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2">Base Genética y Hereditable</h3>
+                    <p class="text-sm text-slate-300 leading-relaxed">
+                        Estudios de gemelos estiman una heredabilidad entre el <strong>40% y 70%</strong>. Genes de migración neuronal como <em>KIAA0319</em> y <em>DCDC2</em> están fuertemente vinculados al desarrollo de circuitos de lectoescritura.
+                    </p>
+                </div>
+
+                <!-- Card 2: Neuroimagen -->
+                <div class="glass-card p-6 rounded-2xl border border-slate-800 hover:border-slate-700 transition">
+                    <div class="w-12 h-12 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center text-xl mb-4">
+                        <i class="fa-solid fa-brain"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2">Alteraciones Neuroanatómicas</h3>
+                    <p class="text-sm text-slate-300 leading-relaxed">
+                        Imágenes por RMf muestran hipoactivación fonológica en áreas temporo-parietales esquerdas (Dislexia) y disfunción primaria focalizada en el <strong>surco intraparietal</strong> (Discalculia).
+                    </p>
+                </div>
+
+                <!-- Card 3: DSM-5 Criterios -->
+                <div class="glass-card p-6 rounded-2xl border border-slate-800 hover:border-slate-700 transition">
+                    <div class="w-12 h-12 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xl mb-4">
+                        <i class="fa-solid fa-book-bookmark"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2">Consenso Clínico Unificado</h3>
+                    <p class="text-sm text-slate-300 leading-relaxed">
+                        Tanto el <strong>DSM-5</strong> (Código 315) como la <strong>CIE-11</strong> (6A03) abandonan las etiquetas aisladas y las agrupan bajo el <em>Trastorno Específico del Aprendizaje</em>, especificando las áreas académicas afectadas.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Neuro Diagram Graphic Card -->
+            <div class="glass-card p-6 rounded-2xl border border-slate-800 flex flex-col md:flex-row items-center gap-6">
+                <div class="w-full md:w-1/2">
+                    <h4 class="text-lg font-bold text-white mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-diagram-project text-blue-400"></i> Redes Neurocognitivas Involucradas
+                    </h4>
+                    <p class="text-sm text-slate-300 leading-relaxed mb-4">
+                        Las DEA no responden a falta de inteligencia ni negligencia pedagógica. Son variaciones en la conectividad de redes especializadas: la ruta fonológica ventral/dorsal, la red de procesamiento cuantitativo parietal y el control visoespacial motor fino.
+                    </p>
+                    <div class="flex flex-wrap gap-2 text-xs">
+                        <span class="px-3 py-1 bg-slate-800 text-blue-300 rounded-full border border-slate-700">Giro Angular</span>
+                        <span class="px-3 py-1 bg-slate-800 text-purple-300 rounded-full border border-slate-700">Surco Intraparietal</span>
+                        <span class="px-3 py-1 bg-slate-800 text-emerald-300 rounded-full border border-slate-700">Área de Broca / Wernicke</span>
+                    </div>
+                </div>
+                <div class="w-full md:w-1/2 flex justify-center bg-slate-900/80 p-4 rounded-xl border border-slate-800">
+                    <!-- SVG Diagram: Brain Regions -->
+                    <svg viewBox="0 0 400 220" class="w-full max-w-sm h-auto">
+                        <!-- Brain Silhouette -->
+                        <path d="M 100 150 C 60 150, 40 100, 70 70 C 100 30, 200 20, 290 50 C 350 70, 360 130, 330 160 C 300 190, 230 190, 200 170 C 170 170, 140 190, 100 150 Z" fill="#1e293b" stroke="#475569" stroke-width="2"/>
+                        <!-- Cerebellum -->
+                        <path d="M 230 170 C 260 170, 310 180, 290 205 C 260 215, 230 200, 230 170 Z" fill="#334155" stroke="#64748b" stroke-width="1.5"/>
+                        
+                        <!-- Region 1: Dislexia (Temporo-Parietal) -->
+                        <circle cx="210" cy="90" r="22" fill="#2563eb" fill-opacity="0.4" stroke="#60a5fa" stroke-width="2"/>
+                        <circle cx="210" cy="90" r="5" fill="#93c5fd"/>
+                        <text x="210" y="60" text-anchor="middle" fill="#93c5fd" font-size="11" font-weight="bold">Área Lectora (Dislexia)</text>
+
+                        <!-- Region 2: Discalculia (Surco Intraparietal) -->
+                        <circle cx="260" cy="80" r="20" fill="#7c3aed" fill-opacity="0.4" stroke="#c084fc" stroke-width="2"/>
+                        <circle cx="260" cy="80" r="5" fill="#e9d5ff"/>
+                        <text x="280" y="55" text-anchor="middle" fill="#e9d5ff" font-size="11" font-weight="bold">S. Intraparietal (Discalculia)</text>
+
+                        <!-- Region 3: Disgrafía (Corteza Motora / Visoespacial) -->
+                        <circle cx="150" cy="85" r="18" fill="#059669" fill-opacity="0.4" stroke="#34d399" stroke-width="2"/>
+                        <circle cx="150" cy="85" r="5" fill="#a7f3d0"/>
+                        <text x="120" y="65" text-anchor="middle" fill="#a7f3d0" font-size="11" font-weight="bold">Corteza Motora (Disgrafía)</text>
+                    </svg>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: DETAILED INTERACTIVE ACCORDIONS -->
+        <section id="trastornos" class="space-y-6">
+            <div class="flex items-center gap-3">
+                <div class="w-2 h-7 bg-purple-500 rounded-full"></div>
+                <h2 class="text-2xl font-bold text-white">2. Análisis Profundo por Trastorno</h2>
+            </div>
+
+            <p class="text-slate-300 text-sm">Haz clic en cada sección para desplegar las características, tipologías, modelos de intervención y adaptaciones curriculares específicas.</p>
+
+            <!-- ACCORDION ITEM 1: DISLEXIA -->
+            <div class="glass-card rounded-2xl border border-slate-800 overflow-hidden">
+                <button onclick="toggleAccordion('acc-dislexia')" class="w-full p-6 text-left flex items-center justify-between hover:bg-slate-800/50 transition">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-blue-600/20 text-blue-400 flex items-center justify-center text-xl font-bold">
+                            <i class="fa-solid fa-book-open-reader"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-white">Dislexia: Dificultad Específica en Lectura</h3>
+                            <p class="text-xs text-slate-400">Prevalencia: ~5-10% | Afectación Fonológica y Léxica</p>
+                        </div>
+                    </div>
+                    <i id="icon-acc-dislexia" class="fa-solid fa-chevron-down text-slate-400 text-lg transition-transform duration-300"></i>
+                </button>
+
+                <div id="acc-dislexia" class="accordion-content border-t border-slate-800/80 bg-slate-900/40 px-6 py-6 space-y-6">
+                    <!-- Grid of content -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Subtypes -->
+                        <div class="bg-slate-900/90 p-5 rounded-xl border border-slate-800">
+                            <h4 class="font-bold text-blue-400 mb-3 text-sm uppercase tracking-wider flex items-center gap-2">
+                                <i class="fa-solid fa-sitemap"></i> Subtipos Neuropsicológicos
+                            </h4>
+                            <ul class="space-y-3 text-sm text-slate-300">
+                                <li class="p-3 bg-slate-800/60 rounded-lg">
+                                    <strong class="text-white block mb-1">1. Dislexia Fonológica (Indirecta):</strong>
+                                    Falla en la ruta grafema-fonema. Imposibilidad de leer palabras desconocidas o pseudopalabras. Presenta paralexias visuales o derivativas.
+                                </li>
+                                <li class="p-3 bg-slate-800/60 rounded-lg">
+                                    <strong class="text-white block mb-1">2. Dislexia Superficial (Visual):</strong>
+                                    Falla en la ruta directa o léxica. Lectura silábica muy lenta. Dificultad para recordar la forma visual global de las palabras (problemas con homófonos).
+                                </li>
+                                <li class="p-3 bg-slate-800/60 rounded-lg">
+                                    <strong class="text-white block mb-1">3. Dislexia Mixta / Profunda:</strong>
+                                    Ambas rutas comprometidas. Aparición de paralexias semánticas (ej. leer "vehículo" donde dice "autobús").
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Interventions & Adaptations -->
+                        <div class="bg-slate-900/90 p-5 rounded-xl border border-slate-800">
+                            <h4 class="font-bold text-emerald-400 mb-3 text-sm uppercase tracking-wider flex items-center gap-2">
+                                <i class="fa-solid fa-sliders"></i> Intervención y Adaptaciones
+                            </h4>
+                            <div class="space-y-3 text-sm text-slate-300">
+                                <div>
+                                    <strong class="text-white">Intervención Reeducativa:</strong>
+                                    <p class="mt-1 text-slate-300">Enfoque multisensorial sistemático (Orton-Gillingham). Entrenamiento en conciencia fonológica (segmentación, rimas, manipulación explícita de sonido-grafía).</p>
+                                </div>
+                                <div class="pt-2 border-t border-slate-800">
+                                    <strong class="text-white">Adaptaciones Curriculares No Significativas:</strong>
+                                    <ul class="list-disc list-inside mt-1 space-y-1 text-slate-400">
+                                        <li>Concesión de 25% a 50% de tiempo extra en exámene escritas.</li>
+                                        <li>Priorizar evaluaciones orales o apoyo con lectores de texto (software TTS).</li>
+                                        <li>Evitar la lectura no preparada en voz alta frente al grupo.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ACCORDION ITEM 2: DISCALCULIA -->
+            <div class="glass-card rounded-2xl border border-slate-800 overflow-hidden">
+                <button onclick="toggleAccordion('acc-discalculia')" class="w-full p-6 text-left flex items-center justify-between hover:bg-slate-800/50 transition">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-purple-600/20 text-purple-400 flex items-center justify-center text-xl font-bold">
+                            <i class="fa-solid fa-calculator"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-white">Discalculia: Dificultad Específica en Matemáticas</h3>
+                            <p class="text-xs text-slate-400">Prevalencia: ~3-6% | Afectación del Sentido Numérico y Razonamiento</p>
+                        </div>
+                    </div>
+                    <i id="icon-acc-discalculia" class="fa-solid fa-chevron-down text-slate-400 text-lg transition-transform duration-300"></i>
+                </button>
+
+                <div id="acc-discalculia" class="accordion-content border-t border-slate-800/80 bg-slate-900/40 px-6 py-6 space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Subtypes -->
+                        <div class="bg-slate-900/90 p-5 rounded-xl border border-slate-800">
+                            <h4 class="font-bold text-purple-400 mb-3 text-sm uppercase tracking-wider flex items-center gap-2">
+                                <i class="fa-solid fa-shapes"></i> Subtipos Cognitivos (Geary & Butterworth)
+                            </h4>
+                            <ul class="space-y-3 text-sm text-slate-300">
+                                <li class="p-3 bg-slate-800/60 rounded-lg">
+                                    <strong class="text-white block mb-1">1. Verbal / Lingüística:</strong>
+                                    Dificultad para nombrar cantidades, términos numéricos y comprender enunciados verbales de problemas.
+                                </li>
+                                <li class="p-3 bg-slate-800/60 rounded-lg">
+                                    <strong class="text-white block mb-1">2. Léxica y Gráfica:</strong>
+                                    Incapacidad para leer o escribir símbolos matemáticos ($+$, $-$, $\times$, $\div$) e interpretar dígitos visuales.
+                                </li>
+                                <li class="p-3 bg-slate-800/60 rounded-lg">
+                                    <strong class="text-white block mb-1">3. Operacional / Procedimental:</strong>
+                                    Fallas en la secuenciación de pasos de algoritmos (llevadas, restas con ceros) y automatización de tablas.
+                                </li>
+                                <li class="p-3 bg-slate-800/60 rounded-lg">
+                                    <strong class="text-white block mb-1">4. Practognóstica (Sentido Numérico):</strong>
+                                    Déficit central en la subitización (estimación rápida de magnitudes sin contar una a una).
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- CRA Model Diagram + Interventions -->
+                        <div class="bg-slate-900/90 p-5 rounded-xl border border-slate-800 flex flex-col justify-between">
+                            <div>
+                                <h4 class="font-bold text-amber-400 mb-3 text-sm uppercase tracking-wider flex items-center gap-2">
+                                    <i class="fa-solid fa-cubes"></i> Modelo CRA & Adaptaciones
+                                </h4>
+                                <p class="text-xs text-slate-300 mb-4">
+                                    Progresión metodológica indispensable: <strong>Concreto $\rightarrow$ Pictórico $\rightarrow$ Abstracto</strong>.
+                                </p>
+                                <!-- SVG CRA Progression -->
+                                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 mb-4 flex justify-around items-center">
+                                    <div class="text-center">
+                                        <div class="w-10 h-10 mx-auto bg-amber-500/20 text-amber-400 rounded-lg flex items-center justify-center font-bold text-lg mb-1">
+                                            <i class="fa-solid fa-cubes-stacked"></i>
+                                        </div>
+                                        <span class="text-[11px] text-slate-300 font-medium">Concreto</span>
+                                    </div>
+                                    <i class="fa-solid fa-arrow-right text-slate-600"></i>
+                                    <div class="text-center">
+                                        <div class="w-10 h-10 mx-auto bg-purple-500/20 text-purple-400 rounded-lg flex items-center justify-center font-bold text-lg mb-1">
+                                            <i class="fa-solid fa-image"></i>
+                                        </div>
+                                        <span class="text-[11px] text-slate-300 font-medium">Pictórico</span>
+                                    </div>
+                                    <i class="fa-solid fa-arrow-right text-slate-600"></i>
+                                    <div class="text-center">
+                                        <div class="w-10 h-10 mx-auto bg-blue-500/20 text-blue-400 rounded-lg flex items-center justify-center font-bold text-lg mb-1">
+                                            <span class="text-sm font-bold">x + y</span>
+                                        </div>
+                                        <span class="text-[11px] text-slate-300 font-medium">Abstracto</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-sm text-slate-300 space-y-2 border-t border-slate-800 pt-3">
+                                <strong class="text-white">Adaptaciones Curriculares:</strong>
+                                <ul class="list-disc list-inside text-slate-400 space-y-1">
+                                    <li>Uso de calculadora autorizada en tareas de razonamiento lógico.</li>
+                                    <li>Hojas de apoyo con tablas de multiplicar y formularios.</li>
+                                    <li>Papel cuadriculado de cuadrícula grande para alinear columnas.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ACCORDION ITEM 3: DISGRAFIA -->
+            <div class="glass-card rounded-2xl border border-slate-800 overflow-hidden">
+                <button onclick="toggleAccordion('acc-disgrafia')" class="w-full p-6 text-left flex items-center justify-between hover:bg-slate-800/50 transition">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-emerald-600/20 text-emerald-400 flex items-center justify-center text-xl font-bold">
+                            <i class="fa-solid fa-pen-nib"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-white">Disgrafía y Disortografía: Dificultad en Expresión Escrita</h3>
+                            <p class="text-xs text-slate-400">Prevalencia: ~4-8% | Afectación Motora, Visoespacial y Ortográfica</p>
+                        </div>
+                    </div>
+                    <i id="icon-acc-disgrafia" class="fa-solid fa-chevron-down text-slate-400 text-lg transition-transform duration-300"></i>
+                </button>
+
+                <div id="acc-disgrafia" class="accordion-content border-t border-slate-800/80 bg-slate-900/40 px-6 py-6 space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Disgrafía vs Disortografía -->
+                        <div class="bg-slate-900/90 p-5 rounded-xl border border-slate-800">
+                            <h4 class="font-bold text-emerald-400 mb-3 text-sm uppercase tracking-wider flex items-center gap-2">
+                                <i class="fa-solid fa-pen-ruler"></i> Componente Motor vs. Ortográfico
+                            </h4>
+                            <div class="space-y-3 text-sm">
+                                <div class="p-3 bg-slate-800/60 rounded-lg">
+                                    <strong class="text-white block mb-1">Disgrafía Motora / Visoespacial:</strong>
+                                    Alteración del trazo, presión inadecuada sobre el papel, letras de tamaño desigual e imposibilidad de mantener el alineamiento en el renglón. Fatiga muscular severa.
+                                </div>
+                                <div class="p-3 bg-slate-800/60 rounded-lg">
+                                    <strong class="text-white block mb-1">Disortografía (Procesual):</strong>
+                                    Dificultad para estructurar las reglas ortográficas y la correspondencia grafema-fonema. Errores sistemáticos de omisión, sustitución y segmentación de palabras.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Intervención y Adaptación -->
+                        <div class="bg-slate-900/90 p-5 rounded-xl border border-slate-800">
+                            <h4 class="font-bold text-blue-400 mb-3 text-sm uppercase tracking-wider flex items-center gap-2">
+                                <i class="fa-solid fa-laptop-code"></i> Intervención y Adaptaciones Tecnológicas
+                            </h4>
+                            <div class="space-y-3 text-sm text-slate-300">
+                                <p><strong>Reeducación:</strong> Control tónico, ergonomía del lápiz (adaptadores de pinza/grips), ejercicios de coordinación visomotora y planificación textual con mapas conceptuales.</p>
+                                <div class="pt-2 border-t border-slate-800">
+                                    <strong class="text-white">Adaptaciones Curriculares:</strong>
+                                    <ul class="list-disc list-inside mt-1 space-y-1 text-slate-400">
+                                        <li>Uso de dictado por voz (Voice-to-Text) y procesador de textos con corrector.</li>
+                                        <li>Exención o reducción considerable del copiado de la pizarra (entregar apuntes impresos).</li>
+                                        <li>Evaluar el contenido semántico e idóneo de los textos, independientemente de la ortografía o trazado.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: COMORBIDITY MATRIX -->
+        <section id="comorbilidad" class="space-y-6">
+            <div class="flex items-center gap-3">
+                <div class="w-2 h-7 bg-emerald-500 rounded-full"></div>
+                <h2 class="text-2xl font-bold text-white">3. Matriz de Comorbilidad Neurobiológica</h2>
+            </div>
+
+            <div class="glass-card p-6 rounded-2xl border border-slate-800">
+                <p class="text-sm text-slate-300 mb-6 leading-relaxed">
+                    Las dificultades específicas del aprendizaje presentan una comorbilidad de entre el <strong>40% y 70%</strong>. Esto implica que las fallas en memoria de trabajo, velocidad de procesamiento o control motor suelen solaparse clínicamente.
+                </p>
+
+                <!-- Responsive Table -->
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-slate-900 text-slate-400 uppercase text-xs">
+                            <tr>
+                                <th class="p-3 rounded-l-lg">Trastorno Comórbido</th>
+                                <th class="p-3">Tasa Estimada</th>
+                                <th class="p-3">Manifestación Clínica Conjunta</th>
+                                <th class="p-3 rounded-r-lg">Impacto Funcional</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-800 text-slate-300">
+                            <tr class="hover:bg-slate-900/50 transition">
+                                <td class="p-3 font-semibold text-white flex items-center gap-2">
+                                    <i class="fa-solid fa-bolt text-amber-400"></i> TDAH
+                                </td>
+                                <td class="p-3 text-amber-400 font-bold">30% - 50%</td>
+                                <td class="p-3">Déficit en funciones ejecutivas (atención sostenida e inhibición) sumado a fallas fonológicas o de cálculo.</td>
+                                <td class="p-3 text-xs bg-slate-900/60 rounded">Alta fatigabilidad, impulsividad en respuestas.</td>
+                            </tr>
+                            <tr class="hover:bg-slate-900/50 transition">
+                                <td class="p-3 font-semibold text-white flex items-center gap-2">
+                                    <i class="fa-solid fa-hands text-blue-400"></i> TDC / Dispraxia
+                                </td>
+                                <td class="p-3 text-blue-400 font-bold">40% - 50%</td>
+                                <td class="p-3">Dificultades en motricidad fina/gruesa. Causa principal de disgrafía motora y torpeza manipulativa.</td>
+                                <td class="p-3 text-xs bg-slate-900/60 rounded">Dolor muscular al escribir, lentitud psicomotora.</td>
+                            </tr>
+                            <tr class="hover:bg-slate-900/50 transition">
+                                <td class="p-3 font-semibold text-white flex items-center gap-2">
+                                    <i class="fa-solid fa-comments text-purple-400"></i> TEL / TDL (Lenguaje)
+                                </td>
+                                <td class="p-3 text-purple-400 font-bold">30% - 40%</td>
+                                <td class="p-3">Alteración persistente en lenguaje oral temprano. Principal predictor neurocognitivo de Dislexia.</td>
+                                <td class="p-3 text-xs bg-slate-900/60 rounded">Pobre vocabulario y baja comprensión inferencial.</td>
+                            </tr>
+                            <tr class="hover:bg-slate-900/50 transition">
+                                <td class="p-3 font-semibold text-white flex items-center gap-2">
+                                    <i class="fa-solid fa-heart-crack text-rose-400"></i> Ansiedad / Depresión
+                                </td>
+                                <td class="p-3 text-rose-400 font-bold">Secundaria (Frecuente)</td>
+                                <td class="p-3">Ansiedad matemática o fobia a leer en público producto de la indefensión aprendida y frustración académica.</td>
+                                <td class="p-3 text-xs bg-slate-900/60 rounded">Baja autoestima, evitación o conductas disruptivas.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: CASE STUDIES -->
+        <section id="casos" class="space-y-6">
+            <div class="flex items-center gap-3">
+                <div class="w-2 h-7 bg-amber-500 rounded-full"></div>
+                <h2 class="text-2xl font-bold text-white">4. Estudios de Casos Prácticos</h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Case 1: Mateo (Dislexia) -->
+                <div class="glass-card p-6 rounded-2xl border border-slate-800 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="px-3 py-1 bg-blue-500/20 text-blue-400 rounded-full text-xs font-bold border border-blue-500/30">Caso 1: Dislexia</span>
+                            <span class="text-xs text-slate-400">9 años (3er Grado)</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-2">Mateo: Dificultad Fonológica</h3>
+                        <p class="text-xs text-slate-300 leading-relaxed mb-4">
+                            Presenta una lectura silábica laboriosa (18 palabras/min). Confunde letras simétricas (<em>b/d</em>, <em>p/q</em>) y sustituye palabras por adivinación visual contextuada.
+                        </p>
+                        <div class="bg-slate-900 p-3 rounded-xl border border-slate-800 text-xs text-slate-300 space-y-2">
+                            <div><strong class="text-blue-400">Diagnóstico:</strong> Dislexia Fonológica severa comórbida con Ansiedad de Rendimiento.</div>
+                            <div><strong class="text-emerald-400">Adaptación Clave:</strong> Tiempo extra + software lector de pantalla + evaluación oral.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Case 2: Sofía (Discalculia) -->
+                <div class="glass-card p-6 rounded-2xl border border-slate-800 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="px-3 py-1 bg-purple-500/20 text-purple-400 rounded-full text-xs font-bold border border-purple-500/30">Caso 2: Discalculia</span>
+                            <span class="text-xs text-slate-400">11 años (5to Grado)</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-2">Sofía: Falla en Sentido Numérico</h3>
+                        <p class="text-xs text-slate-300 leading-relaxed mb-4">
+                            Incapaz de determinar intuitivamente qué número es mayor entre 7 y 9 sin contar con los dedos. No ha automatizado las tablas de multiplicar ni el conteo regresivo.
+                        </p>
+                        <div class="bg-slate-900 p-3 rounded-xl border border-slate-800 text-xs text-slate-300 space-y-2">
+                            <div><strong class="text-purple-400">Diagnóstico:</strong> Discalculia Practognóstica y Operacional.</div>
+                            <div><strong class="text-emerald-400">Adaptación Clave:</strong> Uso permitido de calculadora y tablas impresas + Método CRA manipulativo.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Case 3: Lucas (Disgrafía) -->
+                <div class="glass-card p-6 rounded-2xl border border-slate-800 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="px-3 py-1 bg-emerald-500/20 text-emerald-400 rounded-full text-xs font-bold border border-emerald-500/30">Caso 3: Disgrafía</span>
+                            <span class="text-xs text-slate-400">10 años (4to Grado)</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-2">Lucas: Agrafía Motora y Fatiga</h3>
+                        <p class="text-xs text-slate-300 leading-relaxed mb-4">
+                            Presenta una pauta de agarre en puño con rigidez severa. Sus trazos son ilegibles y experimenta dolor agudo en la muñeca tras 5 minutos de escritura continua.
+                        </p>
+                        <div class="bg-slate-900 p-3 rounded-xl border border-slate-800 text-xs text-slate-300 space-y-2">
+                            <div><strong class="text-emerald-400">Diagnóstico:</strong> Disgrafía Motora pura asociada a Dispraxia fina.</div>
+                            <div><strong class="text-emerald-400">Adaptación Clave:</strong> Dictado por voz (Voice-to-Text) y exención de copiar pizarrón.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 5: INTERACTIVE QUIZ GAME -->
+        <section id="evaluacion" class="space-y-6">
+            <div class="flex items-center gap-3">
+                <div class="w-2 h-7 bg-rose-500 rounded-full"></div>
+                <h2 class="text-2xl font-bold text-white">5. Juego Evaluativo Interactivo</h2>
+            </div>
+
+            <div class="glass-card p-6 md:p-8 rounded-2xl border border-slate-800 relative overflow-hidden" id="quiz-container">
+                <!-- Quiz Header Progress -->
+                <div class="flex items-center justify-between mb-6 border-b border-slate-800 pb-4">
+                    <div>
+                        <span class="text-xs font-semibold text-rose-400 uppercase tracking-wider">Desafío Neuroeducativo</span>
+                        <h3 class="text-xl font-bold text-white" id="quiz-title">Evaluación de Conocimientos Clave</h3>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-xs text-slate-400">Puntaje</span>
+                        <div class="text-2xl font-black text-emerald-400" id="quiz-score">0 / 0</div>
+                    </div>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="w-full bg-slate-900 h-2 rounded-full mb-6 overflow-hidden">
+                    <div id="quiz-progress-bar" class="bg-gradient-to-r from-blue-500 to-rose-500 h-full w-0 transition-all duration-300"></div>
+                </div>
+
+                <!-- Question Box -->
+                <div id="question-card" class="space-y-6">
+                    <div class="text-lg font-medium text-white" id="question-text">Cargando pregunta...</div>
+                    <div class="grid grid-cols-1 gap-3" id="options-container">
+                        <!-- Options injected dynamically via JS -->
+                    </div>
+                    <!-- Feedback Box -->
+                    <div id="feedback-box" class="hidden p-4 rounded-xl text-sm leading-relaxed border"></div>
+                    <button id="next-btn" onclick="nextQuestion()" class="hidden px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition flex items-center gap-2 ml-auto">
+                        Siguiente Pregunta <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+
+                <!-- Results Screen (Hidden initially) -->
+                <div id="results-card" class="hidden text-center py-8 space-y-6">
+                    <div class="w-20 h-20 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center text-4xl mx-auto border border-emerald-500/40">
+                        <i class="fa-solid fa-award"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white">¡Evaluación Completada!</h3>
+                    <p class="text-slate-300 text-base max-w-md mx-auto" id="final-feedback">Has demostrado una comprensión sólida sobre el origen, manifestaciones y adaptaciones de las DEA.</p>
+                    <div class="text-4xl font-extrabold text-emerald-400" id="final-score-text">100%</div>
+                    <button onclick="restartQuiz()" class="px-8 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition inline-flex items-center gap-2">
+                        <i class="fa-solid fa-rotate-right"></i> Reiniciar Evaluación
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 6: APA REFERENCES (COLLAPSIBLE) -->
+        <section class="space-y-4">
+            <div class="glass-card rounded-2xl border border-slate-800 overflow-hidden">
+                <button onclick="toggleAccordion('acc-referencias')" class="w-full p-5 text-left flex items-center justify-between hover:bg-slate-800/50 transition">
+                    <div class="flex items-center gap-3">
+                        <i class="fa-solid fa-graduation-cap text-slate-400 text-lg"></i>
+                        <h3 class="text-base font-bold text-slate-200">Referencias Bibliográficas (Formato APA 7ª Edición)</h3>
+                    </div>
+                    <i id="icon-acc-referencias" class="fa-solid fa-chevron-down text-slate-400 transition-transform duration-300"></i>
+                </button>
+
+                <div id="acc-referencias" class="accordion-content border-t border-slate-800/80 bg-slate-900/50 p-6">
+                    <ul class="space-y-3 text-xs text-slate-400 leading-relaxed font-mono">
+                        <li>• American Psychiatric Association. (2013). <em>Diagnostic and statistical manual of mental disorders (5th ed.)</em>. https://doi.org/10.1176/appi.books.9780890425596</li>
+                        <li>• Butterworth, B. (2010). Foundational numerical capacities and the origins of dyscalculia. <em>Trends in Cognitive Sciences</em>, 14(12), 534-541.</li>
+                        <li>• Geary, D. C. (2004). Mathematics and learning disabilities. <em>Journal of Learning Disabilities</em>, 37(1), 4-15.</li>
+                        <li>• Organización Mundial de la Salud. (2019). <em>Clasificación Internacional de Enfermedades (11.ª ed.)</em>. https://icd.who.int/es</li>
+                        <li>• Shaywitz, S. E., & Shaywitz, B. A. (2008). Paying attention to reading: The neurobiology of dyslexia. <em>Development and Psychopathology</em>, 20(4), 1329-1349.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- JavaScript Logic -->
     <script>
-        let score = 0;
-
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const backdrop = document.getElementById('sidebarBackdrop');
-            sidebar.classList.toggle('-translate-x-full');
-            backdrop.classList.toggle('hidden');
-        }
-
-        function toggleReferencesModal() {
-            const modal = document.getElementById('referencesModal');
-            modal.classList.toggle('hidden');
-        }
-
-        function switchTab(tabId) {
-            // Hide all tabs
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.remove('active');
-            });
-
-            // Deactivate all navigation buttons
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.classList.remove('text-indigo-700', 'bg-indigo-50', 'font-semibold', 'shadow-xs');
-                btn.classList.add('text-slate-600');
-            });
-
-            // Show selected tab
-            const targetTab = document.getElementById('tab-' + tabId);
-            if (targetTab) {
-                targetTab.classList.add('active');
-            }
-
-            // Activate button
-            const targetBtn = document.getElementById('nav-' + tabId);
-            if (targetBtn) {
-                targetBtn.classList.add('text-indigo-700', 'bg-indigo-50', 'font-semibold', 'shadow-xs');
-                targetBtn.classList.remove('text-slate-600');
-            }
-
-            // Close sidebar on mobile after selection
-            if (window.innerWidth < 768) {
-                const sidebar = document.getElementById('sidebar');
-                const backdrop = document.getElementById('sidebarBackdrop');
-                if (!sidebar.classList.contains('-translate-x-full')) {
-                    sidebar.classList.add('-translate-x-full');
-                    backdrop.classList.add('hidden');
-                }
-            }
-        }
-
-        function checkAnswer(button, isCorrect) {
-            if (isCorrect) {
-                button.classList.add('bg-emerald-500', 'text-white', 'border-emerald-600');
-                score += 10;
+        // Accordion Toggle Logic
+        function toggleAccordion(id) {
+            const content = document.getElementById(id);
+            const icon = document.getElementById('icon-' + id);
+            
+            if (content.classList.contains('active')) {
+                content.classList.remove('active');
+                if (icon) icon.style.transform = 'rotate(0deg)';
             } else {
-                button.classList.add('bg-red-500', 'text-white', 'border-red-600');
+                content.classList.add('active');
+                if (icon) icon.style.transform = 'rotate(180deg)';
             }
-            document.getElementById('quizScore').innerText = 'Puntos: ' + score;
-            button.parentElement.querySelectorAll('button').forEach(btn => btn.disabled = true);
         }
+
+        // Quiz Questions Data
+        const quizData = [
+            {
+                question: "¿Cuál es la estructura cerebral que presenta disfunción primaria en el desarrollo de la Discalculia?",
+                options: [
+                    "Corteza prefrontal dorsolateral",
+                    "Surco intraparietal",
+                    "Área de Wernicke",
+                    "Hipocampo ventral"
+                ],
+                correct: 1,
+                explanation: "Correcto. El surco intraparietal es el centro neuroanatómico responsable del procesamiento no verbal de magnitudes y la aprehensión del sentido numérico."
+            },
+            {
+                question: "¿Qué caracteriza a la Dislexia Fonológica?",
+                options: [
+                    "Dificultad para leer palabras desconocidas o pseudopalabras por fallas en la decodificación grafema-fonema",
+                    "Incapacidad completa de mantener el lápiz en la mano",
+                    "Lectura rápida pero con incapacidad de hacer cálculos matemáticos",
+                    "Falla exclusiva en reconocer palabras homófonas como 'hola' u 'ola'"
+                ],
+                correct: 0,
+                explanation: "¡Exacto! La dislexia fonológica altera la ruta indirecta, impidiendo al estudiante descifrar palabras nuevas sonido por sonido."
+            },
+            {
+                question: "Según el DSM-5 y la CIE-11, ¿cómo se agrupan la dislexia, discalculia y disgrafía?",
+                options: [
+                    "Como trastornos afectivos secundarios",
+                    "Bajo la etiqueta unificada de Trastorno Específico del Aprendizaje (TEA)",
+                    "Como deficiencias sensoriales y de coeficiente intelectual bajo",
+                    "Como problemas exclusivos de mala enseñanza escolar"
+                ],
+                correct: 1,
+                explanation: "Correcto. Ambos manuales diagnósticos los agrupan como 'Trastorno Específico del Aprendizaje', especificando las áreas académicas alteradas."
+            },
+            {
+                question: "¿Cuál es una adaptación curricular no significativa recomendada para un alumno con Disgrafía Motora?",
+                options: [
+                    "Eliminar completamente la materia de Lenguaje del currículo",
+                    "Permitir el uso de herramientas de dictado por voz y reducir el copiado de pizarrón",
+                    "Obligarlo a repetir 100 veces el mismo trazo a mano",
+                    "Prohibir el uso de teclados o computadoras"
+                ],
+                correct: 1,
+                explanation: "¡Muy bien! Utilizar procesadores de texto y dictado por voz reduce la fatiga muscular y permite evaluar la capacidad conceptual del estudiante."
+            },
+            {
+                question: "¿Qué rango de comorbilidad suelen presentar las Dificultades Específicas del Aprendizaje con otras condiciones como el TDAH o la Dispraxia?",
+                options: [
+                    "Menos del 5%",
+                    "Entre el 40% y el 70%",
+                    "Exactamente el 100%",
+                    "Cero comorbilidad"
+                ],
+                correct: 1,
+                explanation: "Correcto. La coocurrencia es alta (40-70%) debido a bases neurobiológicas compartidas en la memoria de trabajo y la conectividad neuronal."
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let selectedOption = null;
+
+        function loadQuestion() {
+            const q = quizData[currentQuestion];
+            document.getElementById('question-text').innerText = `${currentQuestion + 1}. ${q.question}`;
+            
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = '';
+
+            const feedbackBox = document.getElementById('feedback-box');
+            feedbackBox.classList.add('hidden');
+            document.getElementById('next-btn').classList.add('hidden');
+
+            // Update Progress Bar
+            const progressPct = ((currentQuestion) / quizData.length) * 100;
+            document.getElementById('quiz-progress-bar').style.width = `${progressPct}%`;
+            document.getElementById('quiz-score').innerText = `${score} / ${quizData.length}`;
+
+            q.options.forEach((optionText, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'w-full text-left p-4 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 hover:bg-slate-800/80 transition text-sm text-slate-200 font-medium flex items-center justify-between';
+                btn.innerHTML = `<span>${optionText}</span> <i class="fa-regular fa-circle text-slate-600"></i>`;
+                btn.onclick = () => selectAnswer(index, btn);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function selectAnswer(index, btnElement) {
+            const q = quizData[currentQuestion];
+            const optionsContainer = document.getElementById('options-container');
+            const buttons = optionsContainer.children;
+
+            // Disable all buttons after selection
+            for (let b of buttons) {
+                b.disabled = true;
+                b.classList.add('opacity-60', 'cursor-not-allowed');
+            }
+
+            const feedbackBox = document.getElementById('feedback-box');
+            feedbackBox.classList.remove('hidden');
+
+            if (index === q.correct) {
+                score++;
+                btnElement.classList.remove('opacity-60', 'bg-slate-900', 'border-slate-800');
+                btnElement.classList.add('bg-emerald-500/20', 'border-emerald-500', 'text-emerald-300');
+                btnElement.querySelector('i').className = 'fa-solid fa-circle-check text-emerald-400 text-lg';
+
+                feedbackBox.className = 'p-4 rounded-xl text-sm leading-relaxed bg-emerald-500/10 border border-emerald-500/30 text-emerald-300';
+                feedbackBox.innerHTML = `<strong class="block mb-1"><i class="fa-solid fa-circle-check"></i> Respuesta Correcta</strong> ${q.explanation}`;
+            } else {
+                btnElement.classList.remove('opacity-60', 'bg-slate-900', 'border-slate-800');
+                btnElement.classList.add('bg-rose-500/20', 'border-rose-500', 'text-rose-300');
+                btnElement.querySelector('i').className = 'fa-solid fa-circle-xmark text-rose-400 text-lg';
+
+                // Highlight correct answer
+                const correctBtn = buttons[q.correct];
+                correctBtn.classList.remove('opacity-60');
+                correctBtn.classList.add('bg-emerald-500/20', 'border-emerald-500', 'text-emerald-300');
+
+                feedbackBox.className = 'p-4 rounded-xl text-sm leading-relaxed bg-rose-500/10 border border-rose-500/30 text-rose-300';
+                feedbackBox.innerHTML = `<strong class="block mb-1"><i class="fa-solid fa-circle-xmark"></i> Respuesta Incorrecta</strong> ${q.explanation}`;
+            }
+
+            document.getElementById('quiz-score').innerText = `${score} / ${quizData.length}`;
+            document.getElementById('next-btn').classList.remove('hidden');
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion < quizData.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            document.getElementById('question-card').classList.add('hidden');
+            document.getElementById('results-card').classList.remove('hidden');
+            document.getElementById('quiz-progress-bar').style.width = '100%';
+
+            const percentage = Math.round((score / quizData.length) * 100);
+            document.getElementById('final-score-text').innerText = `${percentage}% (${score}/${quizData.length})`;
+            
+            const feedbackText = document.getElementById('final-feedback');
+            if (percentage >= 80) {
+                feedbackText.innerText = "¡Excelente trabajo! Has demostrado un alto nivel de dominio en neuropsicología del aprendizaje y adaptación curricular.";
+            } else if (percentage >= 60) {
+                feedbackText.innerText = "¡Buen esfuerzo! Tienes una comprensión sólida de los conceptos principales, aunque puedes repasar algunos subtipos clínicos.";
+            } else {
+                feedbackText.innerText = "Te recomendamos revisar los acordiones interactivos y la matriz de comorbilidad para reforzar tus conocimientos.";
+            }
+        }
+
+        function restartQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            document.getElementById('results-card').classList.add('hidden');
+            document.getElementById('question-card').classList.remove('hidden');
+            loadQuestion();
+        }
+
+        // Initialize quiz on load
+        window.onload = function() {
+            loadQuestion();
+        };
     </script>
 </body>
 </html>
